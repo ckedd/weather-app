@@ -2,39 +2,39 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.tsx', // Entry point of your application
+  entry: './src/index.tsx',
   output: {
-    path: path.resolve(__dirname, 'dist'), // Output directory
-    filename: 'bundle.js', // Output bundle file
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js'], // File extensions to resolve
+    extensions: ['.ts', '.tsx', '.js'],
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/, // Match .ts and .tsx files
-        use: 'ts-loader', // Use ts-loader for TypeScript files
-        exclude: /node_modules/, // Exclude node_modules directory
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
       {
-        test: /\.css$/, // Match .css files
-        use: ['style-loader', 'css-loader'], // Use style-loader and css-loader for CSS files
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './public/index.html', // Template HTML file
+      template: './public/index.html',
     }),
   ],
   devServer: {
     static: {
-        contentBase: path.join(__dirname, 'dist'), // Serve content from the output directory
+      directory: path.join(__dirname, 'dist'),
     },
-    compress: true, // Enable gzip compression
-    port: 3000, // Port for the development server
-    historyApiFallback: true, // Serve index.html for all 404 routes (for React Router)
+    compress: true,
+    port: 3000,
+    historyApiFallback: true,
   },
-  mode: 'development', // Set the mode to development
+  mode: 'development',
 };
