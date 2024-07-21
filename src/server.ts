@@ -98,3 +98,5 @@ app.get('/api/usage/activity-by-time', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+export { app, connectDB };
