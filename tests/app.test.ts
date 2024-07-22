@@ -1,5 +1,16 @@
 import request from 'supertest';
-import { app } from '../src/server';
+import { app, startServer } from '../src/server';
+import { Server } from 'http';
+
+let server: Server;
+
+beforeEach(() => {
+  server = startServer(3002); // Use a different port for testing
+});
+
+afterEach(() => {
+  server.close();
+});
 
 describe('Application', () => {
   it('should return 404 for unknown routes', async () => {
