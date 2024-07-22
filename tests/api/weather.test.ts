@@ -1,24 +1,22 @@
 import request from 'supertest';
-import { app, startServer } from '../../src/server';
+import { app, startServer, stopServer } from '../../src/server';
 import fetchMock from 'jest-fetch-mock';
-import { Server } from 'http';
-
-let server: Server;
 
 beforeAll(() => {
+  startServer();
   fetchMock.enableMocks();
 });
 
-beforeEach(() => {
-  server = startServer(3001); // Use a different port for testing
-});
-
-afterEach(() => {
-  server.close();
-  fetchMock.resetMocks();
+afterAll(() => {
+  stopServer();
+  fetchMock.disableMocks();
 });
 
 describe('GET /api/weather', () => {
+  beforeEach(() => {
+    fetchMock.resetMocks();
+  });
+
   it('should return weather data for Boston', async () => {
     fetchMock.mockResponseOnce(JSON.stringify({
       resolvedAddress: 'Boston, MA',

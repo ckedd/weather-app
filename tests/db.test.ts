@@ -1,6 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { MongoMemoryServer } from 'mongodb-memory-server-global';
-import { connectDB } from '../src/db';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -8,9 +7,10 @@ let client: MongoClient;
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
-  client = new MongoClient(uri);
+  client = new MongoClient(uri, {});
+
   await client.connect();
-}, 30000); // Increase timeout to 30 seconds
+});
 
 afterAll(async () => {
   if (client) {
@@ -21,8 +21,10 @@ afterAll(async () => {
   }
 });
 
-it('should connect to the database', async () => {
-  const db = client.db('weatherApp');
-  const collections = await db.listCollections().toArray();
-  expect(collections).toBeDefined();
+test('should connect to the database', async () => {
+  const db = client.db('test');
+  const collection = db.collection('test-collection');
+  const result = await collection.insertOne({ name: 'Test' });
+
+  expect(result.insertedId).toBeDefined();
 });
