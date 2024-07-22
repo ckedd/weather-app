@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from 'react';
+import { Container, Typography, Card, CardContent, CircularProgress } from '@mui/material';
+import '../styles/App.css'; // Adjust the path if necessary
 
 const App: React.FC = () => {
-  const [weather, setWeather] = useState<any>(null);
-  const [city, setCity] = useState<string>('Boston');
+  const [weather, setWeather] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/weather?city=${city}`)
+    fetch('/api/weather?city=Boston')
       .then(response => response.json())
       .then(data => setWeather(data));
-  }, [city]);
-
-  const handleCityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCity(event.target.value);
-  };
+  }, []);
 
   return (
-    <div>
-      <h1>Weather App</h1>
-      <input type="text" value={city} onChange={handleCityChange} placeholder="Enter city" />
+    <Container>
+      <Typography variant="h3" component="h1" gutterBottom>
+        Weather App
+      </Typography>
       {weather ? (
-        <div>
-          <h2>{weather.resolvedAddress}</h2>
-          <p>Temperature: {weather.currentConditions.temp} °C</p>
-          <p>Condition: {weather.currentConditions.conditions}</p>
-        </div>
+        <Card>
+          <CardContent>
+            <Typography variant="h4">{weather.resolvedAddress}</Typography>
+            <Typography variant="h6">{weather.currentConditions.conditions}</Typography>
+            <Typography variant="h6">{weather.currentConditions.temp}°C</Typography>
+          </CardContent>
+        </Card>
       ) : (
-        <p>Loading...</p>
+        <CircularProgress />
       )}
-    </div>
+    </Container>
   );
 };
 
