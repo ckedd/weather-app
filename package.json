@@ -36,7 +36,9 @@
         "css-loader": "^7.1.2",
         "html-webpack-plugin": "^5.6.0",
         "isomorphic-fetch": "^3.0.0",
-        "jest": "^29.7.0",
+        "jest": {
+            "setupFiles": ["<rootDir>/jest.setup.js"]
+        }, 
         "jest-fetch-mock": "^3.0.3",
         "mongodb-memory-server": "^10.0.0",
         "mongodb-memory-server-global": "^8.0.0",
@@ -51,6 +53,9 @@
         "webpack-dev-server": "^5.0.4"
     },
     "dependencies": {
+        "@emotion/react": "^11.13.0",
+        "@emotion/styled": "^11.13.0",
+        "@mui/material": "^5.16.4",
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
         "glob": "^11.0.0",
