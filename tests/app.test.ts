@@ -1,8 +1,13 @@
 import request from 'supertest';
 import { app, startServer, stopServer } from '../src/server';
 
-beforeAll(startServer);
-afterAll(stopServer);
+beforeAll(() => {
+  startServer();
+});
+
+afterAll(() => {
+  stopServer();
+});
 
 describe('Application', () => {
   it('should return 200 for root route', async () => {

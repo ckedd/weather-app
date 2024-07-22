@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { cache } from '../server';
+import express from 'express';
 
 const router = Router();
 
