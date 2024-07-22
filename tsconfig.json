@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "rootDir": "./",
     "outDir": "./dist",
-    "rootDir": "./src",
-    "typeRoots": ["./node_modules/@types"]
+    "allowJs": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es6",
+    "lib": ["dom", "es2017"],
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "include": ["src", "tests/**/*.ts"],
   "exclude": ["node_modules"]
 }

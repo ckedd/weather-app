@@ -1,6 +1,10 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  moduleNameMapper: {
+    'isomorphic-fetch': 'isomorphic-fetch',
+    'mongodb-memory-server-global': 'mongodb-memory-server-global',
+  },
   transform: {
     '^.+\\.tsx?$': 'babel-jest'
   },
