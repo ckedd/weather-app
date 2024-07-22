@@ -1,33 +1,38 @@
 import express from 'express';
-import fetch from 'node-fetch';
-import { MongoClient } from 'mongodb';
+const fetch = require('node-fetch'); // Use CommonJS require syntax for node-fetch
+import { MongoClient, Db } from 'mongodb';
 import { LRUCache } from 'lru-cache';
 import dotenv from 'dotenv';
+import { connectDB } from './db';
 
 dotenv.config();
 
-// Set up MongoDB connection
-const url = 'mongodb://localhost:27017';
-const client = new MongoClient(url);
+let db: Db;
 
-async function connectDB() {
-  await client.connect();
+connectDB().then(client => {
+  db = client.db('weatherApp');
   console.log('Connected to MongoDB');
-  return client.db('weatherApp');
-}
-
-const dbPromise = connectDB();
+}).catch(error => {
+  console.error('Failed to connect to MongoDB', error);
+});
 
 const app = express();
 const port = 3000;
 
-// Set up LRU cache
-const cache = new LRUCache({
-  max: 500,            // maximum number of items in the cache
-  ttl: 1000 * 60 * 5   // time to live in ms (5 minutes)
+interface WeatherData {
+  resolvedAddress: string;
+  currentConditions: {
+    temp: number;
+    conditions: string;
+  };
+  [key: string]: any;
+}
+
+const cache = new LRUCache<string, WeatherData>({
+  max: 500,
+  ttl: 1000 * 60 * 5,
 });
 
-// Route to fetch weather data from Visual Crossing
 app.get('/api/weather', async (req, res) => {
   const city = req.query.city || 'Boston';
   const cacheKey = `weather-${city}`;
@@ -38,60 +43,27 @@ app.get('/api/weather', async (req, res) => {
 
   try {
     const apiKey = process.env.VISUAL_CROSSING_API_KEY;
-    const response = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=metric&key=${apiKey}&contentType=json`);
-    const data = await response.json();
+    const response = await fetch(
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=metric&key=${apiKey}&contentType=json`
+    );
+    const data: unknown = await response.json();
 
-    // Log request to MongoDB
-    const db = await dbPromise;
-    const logs = db.collection('logs');
-    await logs.insertOne({ city, timestamp: new Date(), weather: data });
+    if (typeof data === 'object' && data !== null && 'resolvedAddress' in data && 'currentConditions' in data) {
+      const weatherData = data as WeatherData;
 
-    // Cache the result
-    cache.set(cacheKey, data);
-    res.json(data);
+      if (db) {
+        const logs = db.collection('logs');
+        await logs.insertOne({ city, timestamp: new Date(), weather: weatherData });
+      }
+
+      cache.set(cacheKey, weatherData);
+      res.json(weatherData);
+    } else {
+      throw new Error('Invalid response structure');
+    }
   } catch (error) {
+    console.error('Failed to fetch weather data:', error);
     res.status(500).json({ error: 'Failed to fetch weather data' });
-  }
-});
-
-// Route to get the most popular locations
-app.get('/api/usage/most-popular-locations', async (req, res) => {
-  try {
-    const db = await dbPromise;
-    const logs = db.collection('logs');
-    const popularLocations = await logs.aggregate([
-      { $group: { _id: '$city', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 5 }
-    ]).toArray();
-    res.json(popularLocations);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch usage data' });
-  }
-});
-
-// Route to get user activity by time of day
-app.get('/api/usage/activity-by-time', async (req, res) => {
-  try {
-    const db = await dbPromise;
-    const logs = db.collection('logs');
-    const activityByTime = await logs.aggregate([
-      {
-        $project: {
-          hour: { $hour: '$timestamp' }
-        }
-      },
-      {
-        $group: {
-          _id: '$hour',
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]).toArray();
-    res.json(activityByTime);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch activity data' });
   }
 });
 

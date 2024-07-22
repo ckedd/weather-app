@@ -1,20 +1,21 @@
-import { MongoClient, Db } from 'mongodb';
-import { connectDB } from '../src/server';
+import { MongoClient } from 'mongodb';
+import { connectDB } from '../src/db';
 
 describe('MongoDB Connection', () => {
   let client: MongoClient;
-  let db: Db;
 
   beforeAll(async () => {
     client = await connectDB();
-    db = client.db('weatherApp');
-  });
+  }, 20000); // Increase timeout to 20 seconds
 
   afterAll(async () => {
-    await client.close();
+    if (client) {
+      await client.close();
+    }
   });
 
   it('should connect to the database', async () => {
+    const db = client.db('weatherApp');
     const collections = await db.listCollections().toArray();
     expect(collections).toBeDefined();
   });

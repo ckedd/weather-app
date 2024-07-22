@@ -1,12 +1,10 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 
 const url = 'mongodb://localhost:27017';
 const client = new MongoClient(url);
 
-async function connectDB() {
+export async function connectDB(): Promise<MongoClient> {
   await client.connect();
   console.log('Connected to MongoDB');
-  return client.db('weatherApp');
+  return client;
 }
-
-export default connectDB;

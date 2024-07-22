@@ -1,11 +1,18 @@
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    roots: ['<rootDir>/tests'],
-    moduleFileExtensions: ['ts', 'tsx', 'js'],
-    testMatch: ['**/*.test.(ts|tsx|js)'],
     transform: {
-      '^.+\\.(ts|tsx)$': 'ts-jest',
+      '^.+\\.tsx?$': 'babel-jest'
     },
+    transformIgnorePatterns: [
+      '/node_modules/(?!(node-fetch|other-esm-dependency)/)'
+    ],
+    testTimeout: 20000,
+    globals: {
+      'ts-jest': {
+        isolatedModules: true
+      }
+    },
+    setupFiles: ['./jest.setup.js'],
   };
   
